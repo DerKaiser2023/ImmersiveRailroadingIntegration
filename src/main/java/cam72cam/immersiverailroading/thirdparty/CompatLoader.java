@@ -2,11 +2,11 @@ package cam72cam.immersiverailroading.thirdparty;
 
 import cam72cam.immersiverailroading.ImmersiveRailroading;
 import cam72cam.mod.ModEvent;
-import net.neoforged.fml.ModList;
+import net.minecraftforge.fml.common.Loader;
 
 public class CompatLoader {
 	public static Object invokeStatic(String modID, String cname, String method, Object ...objects) {
-		if (ModList.get().isLoaded(modID)) {
+		if (Loader.isModLoaded(modID)) {
 			try {
 				Class<?> cls = Class.forName(cname);
 				return cls.getMethod(method).invoke(null, objects);

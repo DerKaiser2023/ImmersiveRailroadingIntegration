@@ -3,7 +3,7 @@ package cam72cam.immersiverailroading.thirdparty.trackapi;
 import cam72cam.mod.ModCore;
 import cam72cam.mod.block.tile.TileEntityTickable;
 import cam72cam.mod.resource.Identifier;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.util.Vec3;
 
 public class TileEntityTickableTrack extends TileEntityTickable implements trackapi.lib.ITrackV2 {
     static {

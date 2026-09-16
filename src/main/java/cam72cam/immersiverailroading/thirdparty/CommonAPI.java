@@ -6,12 +6,13 @@ import cam72cam.immersiverailroading.registry.LocomotiveDefinition;
 import cam72cam.immersiverailroading.tile.TileRailBase;
 import cam72cam.mod.math.Vec3i;
 import cam72cam.immersiverailroading.thirdparty.event.TagEvent;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.fluids.FluidStack;
+import net.minecraft.util.MathHelper;
+import net.minecraft.world.World;
+import net.minecraft.world.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fluids.FluidStack;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -19,11 +20,11 @@ import java.util.function.Supplier;
 public class CommonAPI {
     private final Supplier<EntityRollingStock> stockSupplier;
 
-    public static CommonAPI create(Level world, BlockPos pos) {
+    public static CommonAPI create(World world, BlockPos pos) {
         return create(world, pos, EntityRollingStock.class);
     }
 
-    public static CommonAPI create(Level world, BlockPos pos, Class<? extends EntityRollingStock> stockClass) {
+    public static CommonAPI create(World world, BlockPos pos, Class<? extends EntityRollingStock> stockClass) {
         TileRailBase te = cam72cam.mod.world.World.get(world).getBlockEntity(new Vec3i(pos), TileRailBase.class);
         if (te != null) {
             return new CommonAPI(te, stockClass);
@@ -33,10 +34,6 @@ public class CommonAPI {
 
     public CommonAPI(TileRailBase te, Class<? extends EntityRollingStock> stockClass) {
         stockSupplier = () -> te.getStockNearBy(stockClass);
-    }
-
-    public CommonAPI(EntityRollingStock stock) {
-        stockSupplier = () -> stock;
     }
 
     public EntityRollingStock stock() {
@@ -63,7 +60,7 @@ public class CommonAPI {
             info.put("tag", stock.tag);
             info.put("weight", stock.getWeight());
 
-            Direction dir = Direction.fromYRot(stock.getRotationYaw());
+            EnumFacing dir = EnumFacing.getHorizontal(MathHelper.floor_double(stock.getRotationYaw() / 90.0 + 0.5) & 3);
             if (stock instanceof EntityMoveableRollingStock) {
                 EntityMoveableRollingStock movable = (EntityMoveableRollingStock) stock;
                 info.put("speed", movable.getCurrentSpeed().metric());
@@ -107,7 +104,7 @@ public class CommonAPI {
             FluidStack fluid = getFluid();
             if (fluid != null) {
                 info.put("fluid_type", fluid.getFluid().getFluidType().toString());
-                info.put("fluid_amount", fluid.getAmount());
+                info.put("fluid_amount", fluid.amount);
             } else {
                 info.put("fluid_type", null);
                 info.put("fluid_amount", 0);
@@ -155,7 +152,7 @@ public class CommonAPI {
         info.put("tractive_effort_N", acc.tractiveEffortNewtons);
         info.put("weight_kg", acc.massToMoveKg);
         info.put("speed_km", stock.getCurrentSpeed().metric());
-        Direction dir = Direction.fromYRot(stock.getRotationYaw());
+        EnumFacing dir = EnumFacing.getHorizontal(MathHelper.floor_double(stock.getRotationYaw() / 90.0 + 0.5) & 3);
         if (stock.getCurrentSpeed().metric() < 0) {
             dir = dir.getOpposite();
         }
@@ -184,7 +181,7 @@ public class CommonAPI {
     public String getTag() {
         EntityRollingStock stock = this.stock();
     	TagEvent.GetTagEvent tagEvent = new TagEvent.GetTagEvent(stock.getUUID());
-    	NeoForge.EVENT_BUS.post(tagEvent);
+    	MinecraftForge.EVENT_BUS.post(tagEvent);
     	
     	if (tagEvent.tag != null)
     	{
@@ -197,7 +194,7 @@ public class CommonAPI {
     public void setTag(String tag) {
         EntityRollingStock stock = this.stock();
     	TagEvent.SetTagEvent tagEvent = new TagEvent.SetTagEvent(stock.getUUID(), tag);
-    	NeoForge.EVENT_BUS.post(tagEvent);
+    	MinecraftForge.EVENT_BUS.post(tagEvent);
     	
         stock.tag = tag;
     }

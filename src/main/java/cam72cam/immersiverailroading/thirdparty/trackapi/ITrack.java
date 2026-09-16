@@ -4,7 +4,7 @@ import cam72cam.mod.math.Vec3d;
 import cam72cam.mod.math.Vec3i;
 import cam72cam.mod.world.World;
 import trackapi.lib.ITrackV2;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.util.Vec3;
 import trackapi.lib.Util;
 
 public interface ITrack {

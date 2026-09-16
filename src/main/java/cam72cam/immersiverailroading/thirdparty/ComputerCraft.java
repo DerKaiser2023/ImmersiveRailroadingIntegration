@@ -12,16 +12,16 @@ import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.lua.MethodResult;
 import dan200.computercraft.api.peripheral.*;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.capabilities.IBlockCapabilityProvider;
+import net.minecraft.world.World;
+import net.minecraft.world.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 import java.util.*;
 import java.util.function.Supplier;
 
 public class ComputerCraft {
-    protected static Supplier<IBlockCapabilityProvider<IPeripheral, Direction>> run =
+    protected static Supplier<ICapabilityProvider> run =
             () -> (world, blockPos, state, be, side) -> null;
 
     public static void init() {
@@ -50,10 +50,10 @@ public class ComputerCraft {
     public static class TickHandler {
         private static final Map<BasePeripheral, Set<IComputerAccess>> tickable = new HashMap<>();
 
-        public static void onWorldTick(Level world) {
+        public static void onWorldTick(World world) {
             synchronized (tickable) {
                 tickable.forEach((peripheral, computers) -> {
-                    if (!world.isClientSide && peripheral.world == world) {
+                    if (!world.isRemote && peripheral.world == world) {
                         peripheral.update(computers);
                     }
                 });
@@ -82,7 +82,7 @@ public class ComputerCraft {
     }
 
     private static abstract class BasePeripheral implements IDynamicPeripheral {
-        private final Level world;
+        private final World world;
         private final BlockPos pos;
         private final String[] fnNames;
         private final APICall[] fnImpls;
@@ -90,7 +90,7 @@ public class ComputerCraft {
         private UUID wasOverhead;
         protected Class<? extends EntityRollingStock> typeFilter = EntityRollingStock.class;
 
-        public BasePeripheral(Level world, BlockPos blockPos, LinkedHashMap<String, APICall> methods) {
+        public BasePeripheral(World world, BlockPos blockPos, LinkedHashMap<String, APICall> methods) {
             this.world = world;
             this.pos = blockPos;
             this.api = CommonAPI.create(world, pos);
@@ -185,7 +185,7 @@ public class ComputerCraft {
             });
         }
 
-        public DetectorPeripheral(Level world, BlockPos blockPos) {
+        public DetectorPeripheral(World world, BlockPos blockPos) {
             super(world, blockPos, methods);
         }
 
@@ -234,7 +234,7 @@ public class ComputerCraft {
             });
         }
 
-        public LocoControlPeripheral(Level world, BlockPos blockPos) {
+        public LocoControlPeripheral(World world, BlockPos blockPos) {
             super(world, blockPos, methods);
             typeFilter = Locomotive.class;
         }
