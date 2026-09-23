@@ -11,7 +11,7 @@ repositories {
 	maven {
 		url = "https://cursemaven.com"
 	}
-	maven { url = "https://teamopenindustry.cc/maven" }
+	mavenCentral()
 }
 
 sourceSets {
@@ -25,5 +25,4 @@ sourceSets {
 dependencies {
 	modImplementation "cc.tweaked:cc-tweaked-1.7.10-forge:1.116.2"
 	modImplementation "curse.maven:immersive-engineering-231951:6733669"
-	modImplementation "trackapi:TrackAPI:1.7.10-forge-1.3"
 }
